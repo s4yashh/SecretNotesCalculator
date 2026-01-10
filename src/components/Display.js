@@ -4,22 +4,27 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function Display({ value }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.display}>{value}</Text>
+      <Text style={styles.display} numberOfLines={1} adjustsFontSizeToFit>
+        {value}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    marginBottom: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    backgroundColor: '#000',
+    borderRadius: 12,
+    marginVertical: 12,
+    minHeight: 80,
+    justifyContent: 'center',
   },
   display: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 48,
+    fontWeight: '300',
     textAlign: 'right',
-    color: '#333',
+    color: '#fff',
   },
 });
