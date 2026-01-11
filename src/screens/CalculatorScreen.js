@@ -79,36 +79,46 @@ export default function CalculatorScreen() {
       const newDisplay = display.length === 1 ? '0' : display.slice(0, -1);
       updateDisplay(newDisplay);
     } else if (buttonLabel === '=') {
-      // Calculate and store in history
-      if (display === '0' || display === '' || isLastCharOperator(display)) {
-        updateDisplay('Error');
-        return;
-      }
-
       // SECRET TRIGGER: Check if input is exactly "69/67"
       if (display === '69/67') {
-        // Navigate to SecretNotesScreen without evaluating
+        // Do NOT evaluate
+        // Do NOT show result
+        // Do NOT add to history
+        // Navigate to SecretNotesScreen
         navigation.navigate('SecretNotes');
         // Clear calculator input
         updateDisplay('0');
         return;
       }
 
-      // Normal calculation for all other expressions
+      // NORMAL CALCULATION: For all other expressions
+      // Validate before calculating
+      if (display === '0' || display === '' || isLastCharOperator(display)) {
+        updateDisplay('Error');
+        return;
+      }
+
+      // Evaluate expression
       try {
         const result = evaluateExpression(display);
-        if (result !== 'Error' && isFinite(result)) {
-          const newHistoryItem = {
-            id: Date.now().toString(),
-            expression: display,
-            result: formatNumber(result),
-          };
-          const newHistory = [newHistoryItem, ...history];
-          updateHistory(newHistory);
-          updateDisplay(String(result));
-        } else {
+        
+        // Check if result is valid
+        if (result === 'Error' || !isFinite(result)) {
           updateDisplay('Error');
+          return;
         }
+
+        // Add to history ONLY for valid non-secret calculations
+        const newHistoryItem = {
+          id: Date.now().toString(),
+          expression: display,
+          result: formatNumber(result),
+        };
+        const newHistory = [newHistoryItem, ...history];
+        updateHistory(newHistory);
+        
+        // Show result
+        updateDisplay(String(result));
       } catch {
         updateDisplay('Error');
       }
