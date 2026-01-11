@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, FlatList, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Display from '../components/Display';
 import CalcButton from '../components/CalcButton';
 import HistoryItem from '../components/HistoryItem';
 import { evaluateExpression, formatNumber } from '../utils/evaluateExpression';
+import { saveInput, loadInput, saveHistory, loadHistory } from '../storage/asyncStorage';
 
 const BUTTONS = [
   ['%', '√', '^', '/'],
@@ -19,6 +20,42 @@ export default function CalculatorScreen() {
   const navigation = useNavigation();
   const [display, setDisplay] = useState('0');
   const [history, setHistory] = useState([]);
+
+  // Load data on screen focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [])
+  );
+
+  // Load calculator data from AsyncStorage
+  const loadData = async () => {
+    try {
+      const savedInput = await loadInput();
+      const savedHistory = await loadHistory();
+      
+      setDisplay(savedInput);
+      setHistory(savedHistory);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  };
+
+  // Save input whenever it changes
+  const updateDisplay = (newDisplay) => {
+    setDisplay(newDisplay);
+    saveInput(newDisplay).catch((error) => {
+      console.error('Error saving input:', error);
+    });
+  };
+
+  // Save history whenever it changes
+  const updateHistory = (newHistory) => {
+    setHistory(newHistory);
+    saveHistory(newHistory).catch((error) => {
+      console.error('Error saving history:', error);
+    });
+  };
 
   // Helper function to check if last character is an operator
   const isLastCharOperator = (str) => {
@@ -36,15 +73,15 @@ export default function CalculatorScreen() {
   const handleButtonPress = (buttonLabel) => {
     if (buttonLabel === 'C') {
       // Clear - reset to 0
-      setDisplay('0');
+      updateDisplay('0');
     } else if (buttonLabel === 'DEL') {
       // Delete last character
       const newDisplay = display.length === 1 ? '0' : display.slice(0, -1);
-      setDisplay(newDisplay);
+      updateDisplay(newDisplay);
     } else if (buttonLabel === '=') {
       // Calculate and store in history
       if (display === '0' || display === '' || isLastCharOperator(display)) {
-        setDisplay('Error');
+        updateDisplay('Error');
         return;
       }
 
@@ -53,7 +90,7 @@ export default function CalculatorScreen() {
         // Navigate to SecretNotesScreen without evaluating
         navigation.navigate('SecretNotes');
         // Clear calculator input
-        setDisplay('0');
+        updateDisplay('0');
         return;
       }
 
@@ -66,22 +103,23 @@ export default function CalculatorScreen() {
             expression: display,
             result: formatNumber(result),
           };
-          setHistory([newHistoryItem, ...history]);
-          setDisplay(String(result));
+          const newHistory = [newHistoryItem, ...history];
+          updateHistory(newHistory);
+          updateDisplay(String(result));
         } else {
-          setDisplay('Error');
+          updateDisplay('Error');
         }
       } catch {
-        setDisplay('Error');
+        updateDisplay('Error');
       }
     } else if (buttonLabel === '%') {
       // Percentage - calculate percentage of current number
       if (display === '0' || display === '' || isLastCharOperator(display)) return;
       try {
         const result = evaluateExpression(display) / 100;
-        setDisplay(String(result));
+        updateDisplay(String(result));
       } catch {
-        setDisplay('Error');
+        updateDisplay('Error');
       }
     } else if (buttonLabel === '√') {
       // Square root
@@ -89,39 +127,39 @@ export default function CalculatorScreen() {
       try {
         const num = evaluateExpression(display);
         if (num < 0) {
-          setDisplay('Error');
+          updateDisplay('Error');
         } else {
           const result = Math.sqrt(num);
-          setDisplay(String(result));
+          updateDisplay(String(result));
         }
       } catch {
-        setDisplay('Error');
+        updateDisplay('Error');
       }
     } else if (['+', '-', '*', '/', '^'].includes(buttonLabel)) {
       // Operators - prevent consecutive operators
       if (!canAppendOperator(display, buttonLabel)) {
         // If last char is operator, replace it
         if (isLastCharOperator(display)) {
-          setDisplay(display.slice(0, -1) + buttonLabel);
+          updateDisplay(display.slice(0, -1) + buttonLabel);
         }
         return;
       }
-      setDisplay(display + buttonLabel);
+      updateDisplay(display + buttonLabel);
     } else if (buttonLabel === '.') {
       // Decimal point - prevent multiple dots in same number
       if (display.includes('.') || display === '0') {
         if (display === '0') {
-          setDisplay('0.');
+          updateDisplay('0.');
         }
         return;
       }
-      setDisplay(display + '.');
+      updateDisplay(display + '.');
     } else if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(buttonLabel)) {
       // Digits - append or start new number
       if (display === '0') {
-        setDisplay(buttonLabel);
+        updateDisplay(buttonLabel);
       } else {
-        setDisplay(display + buttonLabel);
+        updateDisplay(display + buttonLabel);
       }
     }
   };
