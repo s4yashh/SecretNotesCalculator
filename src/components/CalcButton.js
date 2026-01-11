@@ -16,14 +16,14 @@ export default function CalcButton({ label, onPress, style }) {
 const styles = StyleSheet.create({
   button: {
     flex: 1,
-    paddingVertical: 16,
-    marginHorizontal: 4,
-    marginVertical: 4,
+    paddingVertical: 12,
+    marginHorizontal: 2,
+    marginVertical: 2,
     backgroundColor: '#E5E5EA',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 60,
+    minHeight: 55,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#000',
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '600',
     textAlign: 'center',
   },

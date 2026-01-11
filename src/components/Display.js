@@ -20,12 +20,12 @@ export default function Display({ value }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 20,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
-    marginVertical: 12,
-    minHeight: 100,
+    marginVertical: 10,
+    minHeight: 90,
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a1a1a',
   },
   display: {
-    fontSize: 48,
+    fontSize: 44,
     fontWeight: '300',
     textAlign: 'right',
     color: '#fff',
@@ -45,6 +45,6 @@ const styles = StyleSheet.create({
   },
   errorDisplay: {
     color: '#FF6B6B',
-    fontSize: 32,
+    fontSize: 28,
   },
 });

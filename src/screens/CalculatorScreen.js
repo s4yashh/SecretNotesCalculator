@@ -140,27 +140,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   history: {
-    flex: 0.25,
-    marginBottom: 8,
+    flex: 0.2,
+    marginBottom: 10,
     backgroundColor: '#fafafa',
     borderRadius: 8,
     paddingHorizontal: 8,
   },
   buttonsContainer: {
-    flex: 0.6,
+    flex: 0.7,
     justifyContent: 'flex-end',
+    marginBottom: 8,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 10,
+    height: 60,
   },
   buttonWrapper: {
     flex: 1,
+    marginHorizontal: 4,
   },
   equalsButton: {
     backgroundColor: '#34C759',
@@ -182,6 +185,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fullWidthButton: {
-    flex: 0.5,
+    flex: 0.25,
+    marginHorizontal: 4,
   },
 });
