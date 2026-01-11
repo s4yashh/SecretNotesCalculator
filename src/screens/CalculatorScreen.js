@@ -18,18 +18,36 @@ export default function CalculatorScreen() {
   const [display, setDisplay] = useState('0');
   const [history, setHistory] = useState([]);
 
+  // Helper function to check if last character is an operator
+  const isLastCharOperator = (str) => {
+    const lastChar = str[str.length - 1];
+    return ['+', '-', '*', '/', '^', '%'].includes(lastChar);
+  };
+
+  // Helper function to prevent consecutive operators
+  const canAppendOperator = (str, operator) => {
+    if (str === '0' || str === '') return false;
+    if (isLastCharOperator(str)) return false;
+    return true;
+  };
+
   const handleButtonPress = (buttonLabel) => {
     if (buttonLabel === 'C') {
-      // Clear
+      // Clear - reset to 0
       setDisplay('0');
     } else if (buttonLabel === 'DEL') {
       // Delete last character
-      setDisplay(display.length === 1 ? '0' : display.slice(0, -1));
+      const newDisplay = display.length === 1 ? '0' : display.slice(0, -1);
+      setDisplay(newDisplay);
     } else if (buttonLabel === '=') {
-      // Calculate
+      // Calculate and store in history
+      if (display === '0' || display === '' || isLastCharOperator(display)) {
+        setDisplay('Error');
+        return;
+      }
       try {
         const result = evaluateExpression(display);
-        if (result !== 'Error') {
+        if (result !== 'Error' && isFinite(result)) {
           const newHistoryItem = {
             id: Date.now().toString(),
             expression: display,
@@ -37,12 +55,15 @@ export default function CalculatorScreen() {
           };
           setHistory([newHistoryItem, ...history]);
           setDisplay(String(result));
+        } else {
+          setDisplay('Error');
         }
       } catch {
         setDisplay('Error');
       }
     } else if (buttonLabel === '%') {
-      // Percentage
+      // Percentage - calculate percentage of current number
+      if (display === '0' || display === '' || isLastCharOperator(display)) return;
       try {
         const result = evaluateExpression(display) / 100;
         setDisplay(String(result));
@@ -51,6 +72,7 @@ export default function CalculatorScreen() {
       }
     } else if (buttonLabel === '√') {
       // Square root
+      if (display === '0' || display === '') return;
       try {
         const num = evaluateExpression(display);
         if (num < 0) {
@@ -62,15 +84,32 @@ export default function CalculatorScreen() {
       } catch {
         setDisplay('Error');
       }
-    } else if (buttonLabel === '^') {
-      // Power (add ^ to expression)
-      setDisplay(display === '0' ? '0^' : display + '^');
-    } else if (buttonLabel === '.' && display.includes('.')) {
-      // Prevent multiple dots
-      return;
-    } else {
-      // Append number or operator
-      setDisplay(display === '0' && buttonLabel !== '.' ? buttonLabel : display + buttonLabel);
+    } else if (['+', '-', '*', '/', '^'].includes(buttonLabel)) {
+      // Operators - prevent consecutive operators
+      if (!canAppendOperator(display, buttonLabel)) {
+        // If last char is operator, replace it
+        if (isLastCharOperator(display)) {
+          setDisplay(display.slice(0, -1) + buttonLabel);
+        }
+        return;
+      }
+      setDisplay(display + buttonLabel);
+    } else if (buttonLabel === '.') {
+      // Decimal point - prevent multiple dots in same number
+      if (display.includes('.') || display === '0') {
+        if (display === '0') {
+          setDisplay('0.');
+        }
+        return;
+      }
+      setDisplay(display + '.');
+    } else if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(buttonLabel)) {
+      // Digits - append or start new number
+      if (display === '0') {
+        setDisplay(buttonLabel);
+      } else {
+        setDisplay(display + buttonLabel);
+      }
     }
   };
 
