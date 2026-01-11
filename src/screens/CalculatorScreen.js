@@ -6,11 +6,12 @@ import HistoryItem from '../components/HistoryItem';
 import { evaluateExpression, formatNumber } from '../utils/evaluateExpression';
 
 const BUTTONS = [
-  ['7', '8', '9', '/'],
-  ['4', '5', '6', '*'],
-  ['1', '2', '3', '-'],
-  ['0', '.', '=', '+'],
-  ['C', 'DEL'],
+  ['%', '√', '^', '/'],
+  ['7', '8', '9', '*'],
+  ['4', '5', '6', '-'],
+  ['1', '2', '3', '+'],
+  ['0', '.', '=', 'DEL'],
+  ['C'],
 ];
 
 export default function CalculatorScreen() {
@@ -40,6 +41,30 @@ export default function CalculatorScreen() {
       } catch {
         setDisplay('Error');
       }
+    } else if (buttonLabel === '%') {
+      // Percentage
+      try {
+        const result = evaluateExpression(display) / 100;
+        setDisplay(String(result));
+      } catch {
+        setDisplay('Error');
+      }
+    } else if (buttonLabel === '√') {
+      // Square root
+      try {
+        const num = evaluateExpression(display);
+        if (num < 0) {
+          setDisplay('Error');
+        } else {
+          const result = Math.sqrt(num);
+          setDisplay(String(result));
+        }
+      } catch {
+        setDisplay('Error');
+      }
+    } else if (buttonLabel === '^') {
+      // Power (add ^ to expression)
+      setDisplay(display === '0' ? '0^' : display + '^');
     } else if (buttonLabel === '.' && display.includes('.')) {
       // Prevent multiple dots
       return;
@@ -61,16 +86,17 @@ export default function CalculatorScreen() {
         label === '=' && styles.equalsButton,
         label === 'C' && styles.clearButton,
         label === 'DEL' && styles.delButton,
-        (label === '/' || label === '*' || label === '-' || label === '+') && styles.operatorButton,
+        (label === '/' || label === '*' || label === '-' || label === '+' || label === '^') && styles.operatorButton,
+        (label === '%' || label === '√') && styles.functionButton,
         style,
       ]}
     />
   );
 
   const renderRow = (buttons) => (
-    <View style={styles.buttonRow}>
+    <View style={[styles.buttonRow, buttons.length === 1 && styles.fullWidthRow]}>
       {buttons.map((btn) => (
-        <View key={btn} style={styles.buttonWrapper}>
+        <View key={btn} style={[styles.buttonWrapper, buttons.length === 1 && styles.fullWidthButton]}>
           {renderButton(btn)}
         </View>
       ))}
@@ -145,9 +171,17 @@ const styles = StyleSheet.create({
   },
   delButton: {
     backgroundColor: '#FF9500',
-    flex: 1,
   },
   operatorButton: {
     backgroundColor: '#5AC8FA',
+  },
+  functionButton: {
+    backgroundColor: '#A2845E',
+  },
+  fullWidthRow: {
+    justifyContent: 'center',
+  },
+  fullWidthButton: {
+    flex: 0.5,
   },
 });
