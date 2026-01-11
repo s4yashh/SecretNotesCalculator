@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import Display from '../components/Display';
 import CalcButton from '../components/CalcButton';
 import HistoryItem from '../components/HistoryItem';
@@ -104,35 +104,47 @@ export default function CalculatorScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* History Section */}
-      <FlatList
-        data={history}
-        renderItem={({ item }) => (
-          <HistoryItem
-            expression={item.expression}
-            result={item.result}
-            onPress={() => handleHistoryPress(item)}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        style={styles.history}
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+      enabled
+    >
+      <ScrollView 
+        style={styles.container}
         scrollEnabled={true}
-        nestedScrollEnabled={true}
-      />
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.innerContainer}>
+          {/* History Section */}
+          <FlatList
+            data={history}
+            renderItem={({ item }) => (
+              <HistoryItem
+                expression={item.expression}
+                result={item.result}
+                onPress={() => handleHistoryPress(item)}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            style={styles.history}
+            scrollEnabled={true}
+            nestedScrollEnabled={true}
+          />
 
-      {/* Display */}
-      <Display value={display} />
+          {/* Display */}
+          <Display value={display} />
 
-      {/* Button Grid */}
-      <View style={styles.buttonsContainer}>
-        {BUTTONS.map((row, index) => (
-          <View key={index}>
-            {renderRow(row)}
+          {/* Button Grid */}
+          <View style={styles.buttonsContainer}>
+            {BUTTONS.map((row, index) => (
+              <View key={index}>
+                {renderRow(row)}
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
-    </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -140,6 +152,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  innerContainer: {
+    flex: 1,
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
