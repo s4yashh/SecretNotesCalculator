@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, FlatList, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Display from '../components/Display';
 import CalcButton from '../components/CalcButton';
 import HistoryItem from '../components/HistoryItem';
@@ -15,6 +16,7 @@ const BUTTONS = [
 ];
 
 export default function CalculatorScreen() {
+  const navigation = useNavigation();
   const [display, setDisplay] = useState('0');
   const [history, setHistory] = useState([]);
 
@@ -45,6 +47,17 @@ export default function CalculatorScreen() {
         setDisplay('Error');
         return;
       }
+
+      // SECRET TRIGGER: Check if input is exactly "69/67"
+      if (display === '69/67') {
+        // Navigate to SecretNotesScreen without evaluating
+        navigation.navigate('SecretNotes');
+        // Clear calculator input
+        setDisplay('0');
+        return;
+      }
+
+      // Normal calculation for all other expressions
       try {
         const result = evaluateExpression(display);
         if (result !== 'Error' && isFinite(result)) {
