@@ -1,30 +1,52 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CalculatorScreen from '../screens/CalculatorScreen';
 import SecretNotesScreen from '../screens/SecretNotesScreen';
 
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen 
-          name="Calculator" 
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#f8f8f8',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+            color: '#1a1a1a',
+          },
+          headerTintColor: '#5AC8FA',
+          cardStyle: {
+            backgroundColor: '#fff',
+          },
+        }}
+        initialRouteName="Calculator"
+      >
+        <Stack.Screen
+          name="Calculator"
           component={CalculatorScreen}
           options={{
-            headerTitle: 'Calculator',
+            title: 'Calculator',
+            headerShown: false,
           }}
         />
-        <Tab.Screen 
-          name="SecretNotes" 
+        <Stack.Screen
+          name="SecretNotes"
           component={SecretNotesScreen}
           options={{
-            headerTitle: 'Secret Notes',
+            title: 'Secret Notes',
+            headerShown: true,
+            headerBackTitle: 'Back',
+            animationEnabled: true,
+            animationTypeForReplace: 'pop',
           }}
         />
-      </Tab.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
